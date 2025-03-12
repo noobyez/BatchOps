@@ -1,0 +1,67 @@
+@echo off
+:menu
+echo Seleziona un'operazione:
+echo 1. Estrai cartelle
+echo 2. Crea cartelle
+echo 3. Sposta cartelle
+echo 4. Estrazione intestazioni
+echo 5. Esci
+set /p choice="Inserisci la tua scelta (1-5): "
+
+if %choice%==1 goto :extract_folders
+if %choice%==2 goto :create_folders
+if %choice%==3 goto :move_folders
+if %choice%==4 goto :extract_headers
+if %choice%==5 goto :end
+
+:extract_folders
+set /p sourcePath="Inserisci il percorso della cartella di origine: "
+set /p destinationPath="Inserisci il percorso della cartella di destinazione: "
+set /p headers="Inserisci le intestazioni delle cartelle da estrarre, separate da virgole: "
+for %%H in (%headers%) do (
+    for /d %%F in ("%sourcePath%\%%H*") do (
+        move "%%F" "%destinationPath%"
+        echo Spostata: %%F -> %destinationPath%
+    )
+)
+echo Operazione completata.
+pause
+goto :menu
+
+:create_folders
+set /p parentFolder="Inserisci il percorso della cartella principale: "
+set /p headers="Inserisci le intestazioni delle nuove cartelle, separate da virgole: "
+for %%H in (%headers%) do (
+    mkdir "%parentFolder%\%%H"
+    echo Cartella creata: %parentFolder%\%%H
+)
+echo Operazione completata.
+pause
+goto :menu
+
+:move_folders
+set /p sourcePath="Inserisci il percorso della cartella di origine: "
+set /p destinationPath="Inserisci il percorso della cartella di destinazione: "
+set /p headers="Inserisci le intestazioni delle cartelle da spostare, separate da virgole: "
+for %%H in (%headers%) do (
+    for /d %%F in ("%sourcePath%\%%H*") do (
+        move "%%F" "%destinationPath%"
+        echo Spostata: %%F -> %destinationPath%
+    )
+)
+echo Operazione completata.
+pause
+goto :menu
+
+:extract_headers
+set /p sourcePath="Inserisci il percorso della cartella di origine: "
+set /p outputFile="Inserisci il percorso e il nome del file di output (es. C:\percorso\elenco_cartelle.txt): "
+dir /b /ad "%sourcePath%" > "%outputFile%"
+echo Elenco delle cartelle salvato in %outputFile%
+pause
+goto :menu
+
+:end
+echo Uscita dal programma.
+pause
+exit

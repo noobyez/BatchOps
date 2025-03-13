@@ -1,0 +1,45 @@
+@echo off
+setlocal enabledelayedexpansion
+
+:inizio
+:: Chiedi all'utente di inserire la data iniziale
+set /p data_iniziale="Inserisci la data iniziale (formato DD-MM-YYYY): "
+
+:: Chiedi all'utente di inserire il numero di settimane
+set /p settimane="Inserisci il numero di settimane da aggiungere: "
+
+:: Verifica che le variabili non siano vuote
+if "%data_iniziale%"=="" (
+    echo Errore: La data iniziale non può essere vuota.
+    goto fine
+)
+
+if "%settimane%"=="" (
+    echo Errore: Il numero di settimane non può essere vuoto.
+    goto fine
+)
+
+:: Converti la data iniziale nel formato YYYY-MM-DD per PowerShell
+for /f "tokens=1-3 delims=-" %%a in ("%data_iniziale%") do (
+    set giorno=%%a
+    set mese=%%b
+    set anno=%%c
+)
+
+set data_iniziale_yyyy_mm_dd=%anno%-%mese%-%giorno%
+
+:: Debug: Mostra la data iniziale convertita
+echo Data iniziale convertita: %data_iniziale_yyyy_mm_dd%
+
+:: Calcola la data di consegna usando PowerShell
+for /f %%i in ('powershell -command "try { [datetime]::ParseExact('%data_iniziale_yyyy_mm_dd%', 'yyyy-MM-dd', $null).AddDays(7 * %settimane%).ToString('dd-MM-yyyy') } catch { 'Errore nel calcolo della data' }"') do set "data_consegna=%%i"
+
+:: Debug: Mostra la data di consegna calcolata
+echo Data di consegna calcolata: %data_consegna%
+
+:: Chiedi all'utente se vuole calcolare un'altra data
+set /p continua="Vuoi calcolare un'altra data? (s/n): "
+if /i "%continua%"=="s" goto inizio
+
+:fine
+endlocal
